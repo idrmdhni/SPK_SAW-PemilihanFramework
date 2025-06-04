@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <!-- CSV Upload Section -->
     <div class="row justify-content-center mb-4">
         <div class="col-md-10">
@@ -84,7 +84,7 @@
     </div>
 
     <!-- Manual Input Form -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" id="inputFrameworkForm">
         <div class="col-md-10">
             <div class="card">
                 <div class="card-header bg-success text-white">
@@ -155,32 +155,23 @@
                                         {% endif %}
                                     </div>
                                     <div class="col-md-8">
-                                        <input type="number" 
-                                               class="form-control" 
-                                               id="score_{{ criteria.id }}" 
-                                               name="score_{{ criteria.id }}"
-                                               step="0.01"
-                                               placeholder="Masukkan nilai..."
-                                               {% if criteria.name == "Skalabilitas" %}
-                                                   min="1" max="5"
-                                               {% elif criteria.name == "Performa" %}
-                                                   min="0"
-                                               {% elif criteria.name == "Komunitas" %}
-                                                   min="0"
-                                               {% elif criteria.name == "Kemudahan Belajar" %}
-                                                   min="0"
-                                               {% elif criteria.name == "Pemeliharaan & Update" %}
-                                                   min="0"
-                                               {% endif %}>
-                                        
                                         {% if criteria.name == "Performa" %}
+                                            {{form.performance}}
                                             <div class="form-text">Contoh: 1000 untuk 1000 requests/second</div>
-                                        {% elif criteria.name == "Skalabilitas" %}
+
+                                            {% elif criteria.name == "Skalabilitas" %}
+                                            {{form.scalability}}
                                             <div class="form-text">1 = Sangat Sulit, 5 = Sangat Mudah</div>
-                                        {% elif criteria.name == "Komunitas" %}
+
+                                            {% elif criteria.name == "Komunitas" %}
+                                            {{form.community}}
                                             <div class="form-text">Jumlah pengguna aktif atau kontributor</div>
-                                        {% elif criteria.name == "Kemudahan Belajar" %}
+
+                                            {{form.learning_time}}
+                                            {% elif criteria.name == "Kemudahan Belajar" %}
                                             <div class="form-text">Estimasi jam belajar untuk menguasai dasar</div>
+
+                                            {{form.maintenance}}
                                         {% elif criteria.name == "Pemeliharaan & Update" %}
                                             <div class="form-text">Frekuensi update atau rilis per tahun</div>
                                         {% endif %}
@@ -260,34 +251,34 @@
                     <p class="text-muted mb-3">Klik untuk menambah framework populer dengan nilai contoh:</p>
                     <div class="row">
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('Django', 'Full-stack Python framework dengan admin panel built-in', {performa: 800, skalabilitas: 4, komunitas: 50000, kemudahan: 40, pemeliharaan: 4})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('Django', 'Full-stack Python framework dengan admin panel built-in', {performa: 800, skalabilitas: 4, komunitas: 50000, kemudahan: 40, pemeliharaan: 4})">
                                 Django
-                            </button>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('Flask', 'Micro framework Python yang fleksibel dan ringan', {performa: 1200, skalabilitas: 5, komunitas: 35000, kemudahan: 20, pemeliharaan: 6})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('Flask', 'Micro framework Python yang fleksibel dan ringan', {performa: 1200, skalabilitas: 5, komunitas: 35000, kemudahan: 20, pemeliharaan: 6})">
                                 Flask
-                            </button>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('FastAPI', 'Modern Python framework dengan automatic API documentation', {performa: 2000, skalabilitas: 5, komunitas: 25000, kemudahan: 25, pemeliharaan: 8})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-primary w-100" onclick="fillFormWithScores('FastAPI', 'Modern Python framework dengan automatic API documentation', {performa: 2000, skalabilitas: 5, komunitas: 25000, kemudahan: 25, pemeliharaan: 8})">
                                 FastAPI
-                            </button>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-success w-100" onclick="fillFormWithScores('Express.js', 'Minimalist Node.js framework untuk aplikasi web', {performa: 1500, skalabilitas: 4, komunitas: 40000, kemudahan: 15, pemeliharaan: 10})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-success w-100" onclick="fillFormWithScores('Express.js', 'Minimalist Node.js framework untuk aplikasi web', {performa: 1500, skalabilitas: 4, komunitas: 40000, kemudahan: 15, pemeliharaan: 10})">
                                 Express.js
-                            </button>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-success w-100" onclick="fillFormWithScores('Next.js', 'React framework dengan SSR dan static generation', {performa: 1000, skalabilitas: 4, komunitas: 30000, kemudahan: 35, pemeliharaan: 12})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-success w-100" onclick="fillFormWithScores('Next.js', 'React framework dengan SSR dan static generation', {performa: 1000, skalabilitas: 4, komunitas: 30000, kemudahan: 35, pemeliharaan: 12})">
                                 Next.js
-                            </button>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <button type="button" class="btn btn-outline-warning w-100" onclick="fillFormWithScores('Laravel', 'Elegant PHP framework dengan Artisan CLI', {performa: 600, skalabilitas: 3, komunitas: 45000, kemudahan: 30, pemeliharaan: 6})">
+                            <a href="#inputFrameworkForm" type="button" class="btn btn-outline-warning w-100" onclick="fillFormWithScores('Laravel', 'Elegant PHP framework dengan Artisan CLI', {performa: 600, skalabilitas: 3, komunitas: 45000, kemudahan: 30, pemeliharaan: 6})">
                                 Laravel
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -297,10 +288,6 @@
 </div>
 
 <script>
-function fillForm(name, description) {
-    document.getElementById('{{ form.name.id_for_label }}').value = name;
-    document.getElementById('{{ form.description.id_for_label }}').value = description;
-}
 
 function fillFormWithScores(name, description, scores) {
     // Fill basic info
@@ -309,16 +296,16 @@ function fillFormWithScores(name, description, scores) {
     
     // Fill scores based on criteria names
     {% for criteria in criteria_list %}
-        {% if criteria.name == "Performa" %}
-            if (scores.performa) document.getElementById('score_{{ criteria.id }}').value = scores.performa;
-        {% elif criteria.name == "Skalabilitas" %}
-            if (scores.skalabilitas) document.getElementById('score_{{ criteria.id }}').value = scores.skalabilitas;
-        {% elif criteria.name == "Komunitas" %}
-            if (scores.komunitas) document.getElementById('score_{{ criteria.id }}').value = scores.komunitas;
-        {% elif criteria.name == "Kemudahan Belajar" %}
-            if (scores.kemudahan) document.getElementById('score_{{ criteria.id }}').value = scores.kemudahan;
-        {% elif criteria.name == "Pemeliharaan & Update" %}
-            if (scores.pemeliharaan) document.getElementById('score_{{ criteria.id }}').value = scores.pemeliharaan;
+        {% if criteria.name == 'Performa' %}
+            if (scores.performa) document.getElementById('id_performance').value = scores.performa;
+        {% elif criteria.name == 'Skalabilitas' %}
+            if (scores.skalabilitas) document.getElementById('id_scalability').value = scores.skalabilitas;
+        {% elif criteria.name == 'Komunitas' %}
+            if (scores.komunitas) document.getElementById('id_community').value = scores.komunitas;
+        {% elif criteria.name == 'Kemudahan Belajar' %}
+            if (scores.kemudahan) document.getElementById('id_learning_time').value = scores.kemudahan;
+        {% elif criteria.name == 'Pemeliharaan & Update' %}
+            if (scores.pemeliharaan) document.getElementById('id_maintenance').value = scores.pemeliharaan;
         {% endif %}
     {% endfor %}
 }

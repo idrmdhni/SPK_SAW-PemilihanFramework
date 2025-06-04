@@ -19,7 +19,7 @@
                     </h3>
                     <h4 class="text-primary">
                         Skor Akhir: <span class="badge bg-primary fs-5">{{ best_framework.score_display }}</span>
-                        <small class="text-white-50">({{ best_framework.percentage }}%)</small>
+                        <small class="text-dark-emphasis">({{ best_framework.percentage }}%)</small>
                     </h4>
                     {% else %}
                     <h3 class="text-warning">Tidak ada hasil untuk ditampilkan</h3>
@@ -43,10 +43,10 @@
                         <table class="table table-striped table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th width="10%">Rank</th>
-                                    <th width="30%">Framework</th>
-                                    <th width="20%">Skor Akhir</th>
-                                    <th width="40%">Grafik Skor</th>
+                                    <th width="10%" class="text-dark text-center">Rank</th>
+                                    <th width="30%" class="text-dark text-center">Framework</th>
+                                    <th width="20%" class="text-dark text-center">Skor Akhir</th>
+                                    <th width="40%" class="text-dark text-center">Grafik Skor</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,7 +64,7 @@
                                         {% endif %}
                                     </td>
                                     <td><strong>{{ result.framework }}</strong></td>
-                                    <td><span class="badge bg-primary fs-6">{{ result.score }}</span></td>
+                                    <td class="text-center"><span class="badge bg-primary fs-6">{{ result.score }}</span></td>
                                     <td>
                                         {% with percentage=result.score|multiply:100 %}
                                         <div class="progress" style="height: 20px;">

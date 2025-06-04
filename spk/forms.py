@@ -52,7 +52,7 @@ class CriteriaForm(forms.ModelForm):
 class FrameworkForm(forms.ModelForm):
     class Meta:
         model = Framework
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'community', 'learning_time', 'maintenance', 'performance', 'scalability']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -62,6 +62,37 @@ class FrameworkForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Deskripsi singkat tentang framework ini...'
+            }),
+            'community': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Masukkan nilai...',
+                'step' : '0.01',
+                'min' : '0'
+            }),
+            'learning_time': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Masukkan nilai...',
+                'step' : '0.01',
+                'min' : '0'
+            }),
+            'maintenance': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Masukkan nilai...',
+                'step' : '0.01',
+                'min' : '0'
+            }),
+            'performance': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Masukkan nilai...',
+                'step' : '0.01',
+                'min' : '0'
+            }),
+            'scalability': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Masukkan nilai...',
+                'step' : '1',
+                'min' : '0',
+                'max' : '5'
             }),
         }
         
