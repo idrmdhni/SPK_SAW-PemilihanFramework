@@ -46,7 +46,11 @@
             
             
             
+            
+            
              border-success
+
+
 
 
 
@@ -62,7 +66,11 @@
             
             
             
+            
+            
              border-danger
+
+
 
 
 
@@ -150,7 +158,9 @@
           </div>
           <div class="card-body">
             <div class="d-grid gap-2">
-              <a href="{% url 'add_criteria' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Kriteria</a>
+              {% if user.is_superuser %}
+                <a href="{% url 'add_criteria' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Kriteria</a>
+              {% endif %}
               <a href="{% url 'add_framework' %}" class="btn btn-success"><i class="fas fa-plus"></i> Tambah Framework</a>
               <a href="{% url 'framework_list' %}" class="btn btn-info"><i class="fas fa-list"></i> Lihat Semua Data</a>
               {% comment %} <a href="{% url 'upload_csv' %}" class="btn btn-warning"><i class="fas fa-upload"></i> Import dari CSV</a> {% endcomment %}

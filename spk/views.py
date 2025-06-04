@@ -28,12 +28,8 @@ def admin_required(view_func):
 
 def login(request):
     if request.user.is_authenticated:
-        # Jika user sudah login, cek apakah admin atau user biasa
-        if request.user.is_staff:  # atau gunakan request.user.is_superuser untuk superadmin
-            return redirect('dashboard')  # halaman khusus admin
-        else:
-            return redirect('dashboard_user')  # halaman khusus user biasa
-
+        return redirect('dashboard')  # halaman khusus admin
+        
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -41,11 +37,7 @@ def login(request):
         if user is not None:
             auth_login(request, user)
             messages.success(request, 'Login berhasil!')
-
-            if user.is_staff:
-                return redirect('dashboard')
-            else:
-                return redirect('dashboard_user')
+            return redirect('dashboard')
         else:
             messages.error(request, 'Username atau password salah.')
 
@@ -91,67 +83,21 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 @login_required
-def dashboard_user(request):
-    criteria = Criteria.objects.all()
-    context = {
-        'criteria': criteria,
-    }
-    return render(request, 'user/dashboard_user.html', context)
-
-# Criteria Management
-def criteria_list_view(request):
-    criteria_list = Criteria.objects.all()
-
-    # Hitung total bobot kriteria
-    total_weight = sum(c.weight for c in criteria_list)
-
-    context = {
-        'criteria_list': criteria_list,
-        'total_weight': total_weight,
-    }
-    return render(request, 'user/criteria_list_user.html', context)
-
-@login_required
-def framework_list_user(request):
-    criteria_list = Criteria.objects.all()
-    frameworks = Framework.objects.all()
-    
-    framework_data = []
-    for fw in frameworks:
-        # Ambil scores FrameworkScore untuk framework ini, simpan sebagai dict {criteria_id: value}
-        scores_qs = FrameworkScore.objects.filter(framework=fw)
-        scores = {score.criteria.id: score.value for score in scores_qs}
-
-        
-        framework_data.append({
-            'framework': fw,
-            'scores': scores
-        })
-    
-    total_weight = sum(c.weight for c in criteria_list)
-    
-    return render(request, 'user/framework_list_user.html', {
-        'criteria_list': criteria_list,
-        'framework_data': framework_data,
-        'total_weight': total_weight,
-        'is_ready': criteria_list.exists(),
-    })
-
-
-
-@login_required
 def add_criteria(request):
-    if request.method == 'POST':
-        form = CriteriaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Kriteria "{form.cleaned_data["name"]}" berhasil ditambahkan.')
-            return redirect('framework_list')
+    if (request.user.is_superuser):
+        if request.method == 'POST':
+            form = CriteriaForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f'Kriteria "{form.cleaned_data["name"]}" berhasil ditambahkan.')
+                return redirect('framework_list')
+            else:
+                messages.error(request, 'Terjadi kesalahan saat menambah kriteria.')
         else:
-            messages.error(request, 'Terjadi kesalahan saat menambah kriteria.')
+            form = CriteriaForm()
+        return render(request, 'criteria_form.html', {'form': form})
     else:
-        form = CriteriaForm()
-    return render(request, 'criteria_form.html', {'form': form})
+        return redirect('dashboard')
 
 @login_required
 def criteria_list(request):
@@ -163,16 +109,20 @@ def criteria_list(request):
 
 @login_required
 def edit_criteria(request, criteria_id):
-    criteria = get_object_or_404(Criteria, id=criteria_id)
-    if request.method == 'POST':
-        form = CriteriaForm(request.POST, instance=criteria)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Kriteria "{criteria.name}" berhasil diperbarui.')
-            return redirect('framework_list')
+    if (request.user.is_superuser):
+        criteria = get_object_or_404(Criteria, id=criteria_id)
+        if request.method == 'POST':
+            form = CriteriaForm(request.POST, instance=criteria)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f'Kriteria "{criteria.name}" berhasil diperbarui.')
+                return redirect('framework_list')
+        else:
+            form = CriteriaForm(instance=criteria)
+        return render(request, 'criteria_form.html', {'form': form, 'edit_mode': True})
     else:
-        form = CriteriaForm(instance=criteria)
-    return render(request, 'criteria_form.html', {'form': form, 'edit_mode': True})
+        return redirect('dashboard')
+
 
 @login_required
 def delete_criteria(request, criteria_id):
@@ -182,70 +132,6 @@ def delete_criteria(request, criteria_id):
         criteria.delete()
         messages.success(request, f'Kriteria "{criteria_name}" berhasil dihapus.')
     return redirect('framework_list')
-
-#add framework user
-@login_required
-def add_framework_user(request):
-    criteria_list = Criteria.objects.all()
-
-    if request.method == 'POST':
-        if 'csv_upload' in request.FILES:
-            csv_file = request.FILES['csv_upload']
-            if not csv_file.name.endswith('.csv'):
-                messages.error(request, "File harus format CSV.")
-            else:
-                file_data = TextIOWrapper(csv_file.file, encoding='utf-8-sig')
-                reader = csv.DictReader(file_data, delimiter=';')
-                count = 0
-
-                for row in reader:
-                    row = {k.strip(): v for k, v in row.items()}
-                    name = row.get('Nama')
-                    description = row.get('Deskripsi')
-                    performa = row.get('Performa')
-                    skalabilitas = row.get('Skalabilitas')
-                    komunitas = row.get('Komunitas')
-                    kemudahanBelajar = row.get('Kemudahan Belajar')
-                    pemeliharaan = row.get('Pemeliharaan & Update')
-
-                    if not name:
-                        continue
-
-                    framework = Framework.objects.create(
-                        name=name,
-                        description=description,
-                        community=komunitas,
-                        learning_time=kemudahanBelajar,
-                        maintenance=pemeliharaan,
-                        performance=performa,
-                        scalability=skalabilitas
-                    )
-
-                    # Simpan nilai kriteria
-                    for criteria in criteria_list:
-                        score_val = row.get(criteria.name)
-                        try:
-                            score_val = float(score_val) if score_val else None
-                        except ValueError:
-                            score_val = None
-
-                        if score_val is not None:
-                            FrameworkScore.objects.create(
-                                framework=framework,
-                                criteria=criteria,
-                                value=score_val
-                            )
-
-                    count += 1
-
-                messages.success(request, f'{count} framework berhasil diimport oleh user.')
-                return redirect('framework_list_user')
-        else:
-            messages.error(request, "Silakan upload file CSV.")
-    
-    return render(request, 'user/framework_form.html', {
-        'criteria_list': criteria_list
-    })
 
 @login_required
 def add_framework(request):
@@ -278,7 +164,6 @@ def add_framework(request):
                     if not name:
                         continue  # skip jika nama kosong
                 
-
                     # Simpan framework (bisa ada duplikat)
                     framework = Framework.objects.create(
                         name=name,
@@ -300,6 +185,7 @@ def add_framework(request):
                     # Simpan nilai untuk tiap criteria
                     for criteria in criteria_list:
                         score_val = row.get(criteria.name)
+                        
                         try:
                             score_val = float(score_val) if score_val else None
                         except ValueError:
@@ -318,19 +204,30 @@ def add_framework(request):
         else:
             form = FrameworkForm(request.POST)
             if form.is_valid():
-                fw = form.save()
-                for crit in criteria_list:
-                    nilai = request.POST.get(f'score_{crit.id}')
-                    if nilai:
-                        try:
-                            value = float(nilai)
-                            FrameworkScore.objects.update_or_create(
-                                framework=fw,
-                                criteria=crit,
-                                defaults={'value': value}
-                                )
-                        except ValueError:
-                            continue
+                fw = form.save(commit=False)
+                for criteria in criteria_list:
+                    if (criteria.name == "Performa"):
+                        score_val = request.POST.get('performance')
+                    elif (criteria.name == "Skalabilitas"):
+                        score_val = request.POST.get('scalability')
+                    elif (criteria.name == "Komunitas"):
+                        score_val = request.POST.get('community')
+                    elif (criteria.name == "Kemudahan Belajar"):
+                        score_val = request.POST.get('learning_time')
+                    elif (criteria.name == "KemudahanPemeliharaan & Update"):
+                        score_val = request.POST.get('maintenance')
+                    
+                    try:
+                        score_val = float(score_val) if score_val else None
+                    except ValueError:
+                        score_val = None
+                    if score_val is not None:
+                        fw.save()
+                        FrameworkScore.objects.create(
+                            framework=fw,
+                            criteria=criteria,
+                            value=score_val
+                            )
                 messages.success(request, f'Framework "{fw.name}" berhasil ditambahkan.')
                 return redirect('framework_list')
             else:

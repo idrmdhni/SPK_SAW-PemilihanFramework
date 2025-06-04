@@ -6,7 +6,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1><i class="fas fa-list-alt"></i> Manajemen Framework & Kriteria</h1>
       <div class="btn-group">
-        <a href="{% url 'add_criteria' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Kriteria</a>
+        {% if user.is_superuser %}
+          <a href="{% url 'add_criteria' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Kriteria</a>
+        {% endif %}
         <a href="{% url 'add_framework' %}" class="btn btn-success"><i class="fas fa-plus"></i> Tambah Framework</a>
         {% comment %} <a href="{% url 'upload_csv' %}" class="btn btn-info"><i class="fas fa-upload"></i> Import CSV</a> {% endcomment %}
       </div>
@@ -25,35 +27,39 @@
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>Kriteria</th>
-                      <th>Bobot</th>
-                      <th>Tipe</th>
-                      <th>Aksi</th>
+                      <th class="text-center">Kriteria</th>
+                      <th class="text-center">Bobot</th>
+                      <th class="text-center">Tipe</th>
+                      {% if user.is_superuser %}
+                        <th>Aksi</th>
+                      {% endif %}
                     </tr>
                   </thead>
                   <tbody>
                     {% for criteria in criteria_list %}
                       <tr>
                         <td>{{ criteria.name }}</td>
-                        <td>{{ criteria.weight|floatformat:2 }}</td>
-                        <td>
+                        <td class="text-center">{{ criteria.weight|floatformat:2 }}</td>
+                        <td class="text-center">
                           <span class="badge {% if criteria.attribute == 'benefit' %}
-                               bg-success
+                              bg-success
                             {% else %}
                                bg-warning
                             {% endif %}">
                             {{ criteria.attribute|capfirst }}
                           </span>
                         </td>
-                        <td>
-                          <div class="btn-group btn-group-sm">
-                            <a href="{% url 'edit_criteria' criteria.id %}" class="btn btn-outline-primary btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
-                            <form method="post" action="{% url 'delete_criteria' criteria.id %}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus kriteria ini?')">
-                              {% csrf_token %}
-                              <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>
-                            </form>
-                          </div>
-                        </td>
+                        {% if user.is_superuser %}
+                          <td class="text-center">
+                            <div class="btn-group btn-group-sm d-flex justify-content-between">
+                              <a href="{% url 'edit_criteria' criteria.id %}" class="btn btn-outline-primary btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+                              <form method="post" action="{% url 'delete_criteria' criteria.id %}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus kriteria ini?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>
+                              </form>
+                            </div>
+                          </td>
+                        {% endif %}
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -69,7 +75,13 @@
                         
                         
                         
+                        
+                        
+                        
                         bg-success
+
+
+
 
 
 
@@ -79,7 +91,13 @@
                         
                         
                         
+                        
+                        
+                        
                         bg-danger
+
+
+
 
 
 
@@ -89,7 +107,13 @@
                         
                         
                         
+                        
+                        
+                        
                         bg-warning
+
+
+
 
 
 
